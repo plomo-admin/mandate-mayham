@@ -1,0 +1,681 @@
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+    Arial, sans-serif;
+  background: #f5f5f0;
+  color: #0a0a0a;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+  position: relative;
+}
+
+/* ── Screens ───────────────────────────────────────────────────────────────── */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.screen-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #888;
+  text-transform: uppercase;
+}
+
+/* ── Landing ───────────────────────────────────────────────────────────────── */
+.screen--landing {
+  text-align: center;
+  padding: 56px 0 40px;
+  gap: 16px;
+}
+
+.plomo-logo {
+  width: 120px;
+  height: auto;
+  margin: 0 auto 4px;
+  object-fit: contain;
+}
+
+.landing-title {
+  font-size: clamp(3rem, 14vw, 5.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -3px;
+  text-transform: uppercase;
+}
+
+.landing-subtitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a6640;
+  margin-top: 4px;
+}
+
+.landing-desc {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 8px auto 0;
+}
+
+.microcopy {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+/* ── Nickname section (on landing) ─────────────────────────────────────────── */
+.nickname-section {
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.nickname-generated {
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.nickname-or {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.nickname-input {
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  color: #0a0a0a;
+  background: #fafaf8;
+  transition: border-color 0.15s;
+}
+
+.nickname-input:focus {
+  border-color: #0a0a0a;
+}
+
+.nickname-input::placeholder {
+  color: #bbb;
+}
+
+.nickname-preview {
+  font-size: 0.8rem;
+  color: #1a6640;
+  font-style: italic;
+}
+
+/* ── Meme Block ────────────────────────────────────────────────────────────── */
+.meme-block {
+  width: 100%;
+  padding: 28px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 160px;
+  justify-content: center;
+  font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.meme-block--compact {
+  min-height: 120px;
+  padding: 20px 16px;
+}
+
+.meme-top {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+.meme-bottom {
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+/* ── Task Screen ───────────────────────────────────────────────────────────── */
+.task-card {
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-prompt {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.constraints-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.constraint-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #fff8e1;
+  border: 1px solid #e0c84a;
+  color: #6b5300;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.char-limit-note {
+  font-size: 0.72rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.answer-input {
+  width: 100%;
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.answer-input:focus {
+  border-color: #1a6640;
+}
+
+.answer-input--over {
+  border-color: #c0392b;
+}
+
+.char-counter {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: right;
+  color: #666;
+}
+
+.char-counter--over {
+  color: #c0392b;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 2px solid #0a0a0a;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.12s, color 0.12s;
+  letter-spacing: 0.02em;
+}
+
+.btn--primary {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #1a6640;
+  border-color: #1a6640;
+}
+
+.btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: #0a0a0a;
+}
+
+.btn--secondary:hover {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: #888;
+  border-color: #ddd;
+  font-size: 0.8rem;
+  padding: 7px 16px;
+  font-weight: 600;
+}
+
+.btn--ghost:hover {
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+}
+
+.btn--wide {
+  width: 100%;
+}
+
+.btn--cta {
+  background: #1a6640;
+  color: #fff;
+  border-color: #1a6640;
+  display: inline-block;
+}
+
+.btn--cta:hover {
+  background: #144f31;
+  border-color: #144f31;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Loading Overlay ───────────────────────────────────────────────────────── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(245, 245, 240, 0.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.loading-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.loading-dots span {
+  width: 10px;
+  height: 10px;
+  background: #0a0a0a;
+  border-radius: 50%;
+  animation: bounce 0.8s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+.loading-msg {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  font-style: italic;
+}
+
+/* ── Result Screen ─────────────────────────────────────────────────────────── */
+.screen--result {
+  gap: 28px;
+}
+
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.verdict-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #222;
+}
+
+.roast-line {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #0a0a0a;
+  padding: 12px;
+  border-left: 3px solid #1a6640;
+  background: #f9f9f4;
+}
+
+/* ── Quick Metrics ─────────────────────────────────────────────────────────── */
+.metric-pills {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metric-pill {
+  border: 1px solid #dcdcd4;
+  background: #fff;
+  padding: 10px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-pill-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-pill-score {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0a0a0a;
+}
+
+.verdict-tip {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: #2f2f2f;
+  background: #fff;
+  border: 1px dashed #cfcfc3;
+  padding: 10px 12px;
+}
+
+/* ── Leaderboard ───────────────────────────────────────────────────────────── */
+.ranking-statement {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+  font-style: italic;
+}
+
+.lb-scroll-hint {
+  font-size: 0.72rem;
+  color: #999;
+  margin-top: -4px;
+}
+
+.lb-table-scroll {
+  max-height: min(14.5rem, 42vh);
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lb-table-scroll .lb-table {
+  margin-bottom: 0;
+}
+
+.lb-table-scroll .lb-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  box-shadow: 0 2px 0 #0a0a0a;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.lb-table th {
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  padding: 6px 8px;
+  border-bottom: 2px solid #0a0a0a;
+}
+
+.lb-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #e8e8e2;
+  vertical-align: middle;
+}
+
+.lb-rank {
+  font-weight: 700;
+  color: #999;
+  width: 30px;
+}
+
+.lb-name {
+  font-weight: 600;
+  color: #222;
+}
+
+.lb-score {
+  font-weight: 800;
+  color: #0a0a0a;
+  width: 48px;
+}
+
+.lb-label {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.lb-row--current td {
+  background: #edf7f1;
+  font-weight: 700;
+}
+
+.lb-row--current .lb-rank,
+.lb-row--current .lb-score {
+  color: #1a6640;
+}
+
+.lb-ellipsis td {
+  text-align: center;
+  color: #bbb;
+  padding: 4px;
+  letter-spacing: 4px;
+  border-bottom: 1px solid #e8e8e2;
+}
+
+/* ── Share Card ────────────────────────────────────────────────────────────── */
+.share-card {
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  overflow: hidden;
+}
+
+.share-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sc-title {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.sc-nickname {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #0a0a0a;
+  line-height: 1.2;
+}
+
+.sc-score {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #0a0a0a;
+  letter-spacing: -2px;
+}
+
+.sc-score-denom {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #aaa;
+  letter-spacing: 0;
+}
+
+.sc-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1a6640;
+}
+
+.sc-roast {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #444;
+  line-height: 1.5;
+  border-left: 2px solid #1a6640;
+  padding-left: 10px;
+  margin-top: 4px;
+}
+
+.sc-rank {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  margin-top: 4px;
+}
+
+.sc-cta {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #e8e8e2;
+}
+
+/* ── CTA Block ─────────────────────────────────────────────────────────────── */
+.cta-block {
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cta-main {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cta-sub {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* ── Share Actions ─────────────────────────────────────────────────────────── */
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.share-actions .btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ── Error Banner ──────────────────────────────────────────────────────────── */
+.error-banner {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c0392b;
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 520px;
+  width: calc(100% - 32px);
+  z-index: 200;
+}
+
+.error-banner button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .metric-pills {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-row {
+    flex-direction: column;
+  }
+}

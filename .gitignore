@@ -1,0 +1,10 @@
+# Secrets — never commit
+backend/.env
+.env
+.env.local
+.env.*.local
+
+# Dependencies & build
+node_modules/
+frontend/dist/
+.DS_Store

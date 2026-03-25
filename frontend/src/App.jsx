@@ -289,9 +289,10 @@ function Landing({ generatedNickname, onRegenerate, onStart }) {
 
   return (
     <div className="screen screen--landing">
-      <img className="plomo-logo" src="/plomo.png" alt="Plomo logo" />
       <img className="landing-title-img" src="/Leo.png" alt="Mandate Mayhem" />
-      <p className="landing-subtitle">Can you survive a deal without Plomo?</p>
+      <p className="landing-subtitle">
+        Can you survive a deal without&nbsp;<img className="inline-plomo-logo" src="/plomo.png" alt="Plomo" />?
+      </p>
       <p className="landing-desc">
         Survive one absurd banking task. See how you rank.
       </p>

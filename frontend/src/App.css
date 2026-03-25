@@ -22,6 +22,10 @@ body {
   position: relative;
 }
 
+.app:has(.screen--landing) {
+  padding-top: 0;
+}
+
 /* ── Screens ───────────────────────────────────────────────────────────────── */
 .screen {
   display: flex;
@@ -40,18 +44,8 @@ body {
 /* ── Landing ───────────────────────────────────────────────────────────────── */
 .screen--landing {
   text-align: center;
-  padding: 32px 0 40px;
-  gap: 16px;
-}
-
-/* Show only the square icon portion of the plomo wordmark (icon ~394px of 1198px total) */
-.plomo-logo {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  object-position: left center;
-  display: block;
-  margin: 0 auto;
+  padding: 4px 0 40px;
+  gap: 12px;
 }
 
 .landing-title {
@@ -66,7 +60,21 @@ body {
   width: min(560px, 90vw);
   height: auto;
   display: block;
-  margin: -8px auto 0;
+  margin: 0 auto;
+}
+
+/* Inline Plomo icon inside the subtitle sentence */
+.inline-plomo-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  object-position: left center;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 4px;
+  margin: 0 2px;
+  position: relative;
+  top: -1px;
 }
 
 .landing-subtitle {

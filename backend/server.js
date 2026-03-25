@@ -107,9 +107,18 @@ Reward:
 - clever/funny phrasing that still sounds plausibly workplace-safe
 Penalise meaningfully for: broken constraints, incoherent wording, passive-aggressive tone, missed task, wasted characters, or generic filler.
 
+IMPORTANT — score each sub-dimension completely independently before writing any number:
+
+1. constraint_adherence: Count broken constraints literally. Each broken = −25 pts from 100. If all 3 broken = ~25.
+2. clarity: Would a sleep-deprived junior understand this in one read? Be harsh. Most answers are murkier than they look.
+3. professionalism: Would an MD forward this verbatim? Informal phrasing, filler words, or clumsy structure = deduct.
+4. diplomacy: Any hint of blame, sarcasm, or passive aggression = low score, even if subtle.
+5. passive_aggression_control: Sarcasm or loaded politeness = low. Genuinely neutral = high.
+
+Sub-scores MUST spread — the highest and lowest sub-score must differ by at least 15 points. If they don't, you are clustering and must revise.
+
 Return ONLY valid JSON with no markdown, no code fences, no extra text:
 {
-  "overall_score": <integer 0-100, primary leaderboard sort key>,
   "professionalism": <integer 0-100>,
   "diplomacy": <integer 0-100>,
   "clarity": <integer 0-100>,
@@ -127,22 +136,13 @@ Tone examples for verdict:
 - "You kept it professional, which is impressive given the scene."
 - "This reads like someone who has seen version 19 and lived to tell it."
 
-Scoring calibration — use the FULL range and be precise:
-- Masterclass answer (funny, clear, every constraint nailed, memorable phrasing): 91–99
-- Strong answer (clear, constrained, solid tone, minor room for improvement): 78–90
-- Competent but flat (follows constraints, gets the job done, no spark): 62–77
-- Partial misfire (one constraint broken, tone slightly off, or vague): 45–61
-- Clear failure (multiple constraints broken, incoherent, or misses the task entirely): 20–44
-- Unusable (offensive, nonsensical, or blank equivalent): 0–19
-
-Sub-score rules (each scored independently — they will differ from each other):
-- professionalism: Would an MD forward this without edits? Low if informal, hyperbolic, or clumsy.
-- diplomacy: Does it manage relationships without damage? Low if blaming, confrontational, or passive-aggressive.
-- clarity: Is the message instantly understood in one read? Low if ambiguous, over-compressed, or jargon-dense without payoff.
-- constraint_adherence: Did they follow all 3 constraints precisely? Deduct ~20 pts per broken constraint.
-- passive_aggression_control: Is it genuinely neutral, or is there a detectable edge? Low if sarcasm bleeds through.
-
-Do NOT cluster scores. A mediocre answer should score in the 50s, not the 70s. A great answer should score in the high 80s or 90s, not the mid-70s. Reward genuine quality and punish genuine failures.
+Label calibration:
+- Partner Material: sub-score average 88+
+- Promotable: 75–87
+- Technically Fine: 60–74
+- Needs More Alignment: 45–59
+- Likely Weekend Work: 30–44
+- Please Step Away From The Draft: below 30
 
 Return only the raw JSON object.`
       }]
@@ -150,6 +150,17 @@ Return only the raw JSON object.`
 
     const raw = message.content[0].text.trim();
     const evaluation = JSON.parse(raw);
+
+    // Compute overall_score from sub-scores so it naturally spreads
+    // (weighted avg: clarity + professionalism weighted highest)
+    evaluation.overall_score = Math.round(
+      0.28 * (evaluation.clarity             ?? 50) +
+      0.24 * (evaluation.constraint_adherence ?? 50) +
+      0.20 * (evaluation.professionalism       ?? 50) +
+      0.16 * (evaluation.diplomacy             ?? 50) +
+      0.12 * (evaluation.passive_aggression_control ?? 50)
+    );
+
     res.json(evaluation);
   } catch (err) {
     console.error('evaluate error:', err);

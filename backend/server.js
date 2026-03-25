@@ -43,7 +43,13 @@ Rules:
 - Make it dry and insider — the humour comes from recognition, not randomness
 - Do not start the prompt with "You are" or "As a"
 
-Example constraint styles: "cannot use the word 'delay'", "must sound positive throughout", "no direct blaming", "imply urgency without stating it", "no exclamation marks", "must sound board-ready", "no sarcasm on the surface", "avoid the word 'challenging'"
+Example constraint styles (pick 3 that fit the task — mix categories, do not repeat the same type twice):
+Word bans: "cannot use the word 'delay'", "avoid the word 'challenging'", "cannot use the word 'issue'", "forbidden: 'unfortunately'", "cannot use the word 'concern'", "avoid the word 'discuss'", "cannot use the word 'urgent'"
+Tone rules: "must sound positive throughout", "no sarcasm on the surface", "must sound board-ready", "must sound like a Friday afternoon, not a fire drill", "must sound like this is already resolved", "tone must be collegial, not transactional", "must sound like good news, even if it isn't"
+Structural rules: "no exclamation marks", "no questions — statements only", "no bullet points or lists", "must be a single sentence", "no parentheses", "cannot start with 'I'", "must end with a forward-looking statement"
+Blame and attribution rules: "no direct blaming", "do not mention the client by name or role", "do not reference the original deadline", "cannot imply anyone made a mistake", "do not mention the number of revisions"
+Pressure and urgency rules: "imply urgency without stating it", "must not sound panicked", "cannot acknowledge that time has been lost", "must make the delay sound planned", "cannot ask for anything — only offer"
+Audience rules: "must be safe to forward to the CEO without edits", "must sound like the sender is fully in control", "must be printable in a board pack without context", "cannot assume the reader has any prior context"
 
 Return only the raw JSON object.`
       }]
@@ -199,6 +205,31 @@ app.get('/api/leaderboard', async (req, res) => {
   } catch (err) {
     console.error('leaderboard GET error:', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+app.post('/api/waitlist', async (req, res) => {
+  try {
+    const { email, nickname, score } = req.body;
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Invalid email address' });
+    }
+
+    const { error } = await supabase
+      .from('waitlist_entries')
+      .insert([{ email: email.toLowerCase().trim(), nickname: nickname || null, score: score || null }]);
+
+    // Ignore duplicate email errors — treat as success so we don't leak info
+    if (error && !error.message?.includes('duplicate') && !error.code?.includes('23505')) {
+      throw error;
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('waitlist error:', err);
+    res.status(500).json({ error: 'Failed to save email' });
   }
 });
 

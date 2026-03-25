@@ -629,6 +629,93 @@ body {
   color: #888;
 }
 
+/* ── Contest Block ─────────────────────────────────────────────────────────── */
+.contest-block {
+  border: 2px dashed #1a6640;
+  background: #f4fbf7;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.contest-badge {
+  display: inline-block;
+  background: #1a6640;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 3px 10px;
+  text-transform: uppercase;
+}
+
+.contest-headline {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.contest-body {
+  font-size: 0.85rem;
+  color: #333;
+  line-height: 1.55;
+  max-width: 380px;
+  margin: 0;
+}
+
+.contest-fine-print {
+  font-size: 0.7rem;
+  color: #999;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+.waitlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.waitlist-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  border: 2px solid #0a0a0a;
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.waitlist-input:focus {
+  border-color: #1a6640;
+}
+
+.waitlist-input:disabled {
+  opacity: 0.6;
+}
+
+.waitlist-btn {
+  width: 100%;
+}
+
+.waitlist-success {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a6640;
+  padding: 12px 0 4px;
+}
+
+.waitlist-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+}
+
 /* ── Share Actions ─────────────────────────────────────────────────────────── */
 .share-actions {
   display: flex;

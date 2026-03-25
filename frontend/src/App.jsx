@@ -303,6 +303,26 @@ function ResultScreen({
   const currentRowRef = useRef(null);
   const lbScrollRef = useRef(null);
 
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistState, setWaitlistState] = useState('idle'); // idle | submitting | done | error
+
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim()) return;
+    setWaitlistState('submitting');
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: waitlistEmail, nickname, score: evaluation.overall_score }),
+      });
+      if (!res.ok) throw new Error('failed');
+      setWaitlistState('done');
+    } catch {
+      setWaitlistState('error');
+    }
+  };
+
   const totalEntries = leaderboard.length || 1;
   const outperformed = Math.max(0, Math.round(((totalEntries - rank) / totalEntries) * 100));
   const rankingLine = getRankingLine(evaluation.overall_score, rank, outperformed);
@@ -374,9 +394,6 @@ function ResultScreen({
         <div className="screen-label">QUICK VERDICT</div>
         <p className="verdict-text">{evaluation.verdict}</p>
         <div className="roast-line">"{evaluation.one_line_roast}"</div>
-        <p className="verdict-tip">
-          <strong>Fix for next run:</strong> {evaluation.improvement_tip}
-        </p>
       </div>
 
       <div className="result-section">
@@ -422,6 +439,51 @@ function ResultScreen({
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="contest-block">
+        <div className="contest-badge">FREE PLOMO</div>
+        <div className="contest-headline">
+          Compete for a free Plomo Pro plan.
+        </div>
+        <p className="contest-body">
+          Drop your business email. One person on the leaderboard will get{' '}
+          <strong>3 months of Plomo Pro for free</strong> upon launch, plus
+          eternal fame from their MD for making the workspace more efficient.
+        </p>
+
+        {waitlistState === 'done' ? (
+          <div className="waitlist-success">
+            You're on the list. May the leaderboard be with you.
+          </div>
+        ) : (
+          <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
+            <input
+              className="waitlist-input"
+              type="email"
+              placeholder="your@bank.com"
+              value={waitlistEmail}
+              onChange={e => setWaitlistEmail(e.target.value)}
+              disabled={waitlistState === 'submitting'}
+              required
+            />
+            <button
+              className="btn btn--cta waitlist-btn"
+              type="submit"
+              disabled={waitlistState === 'submitting' || !waitlistEmail.trim()}
+            >
+              {waitlistState === 'submitting' ? 'Submitting...' : 'Join the waitlist →'}
+            </button>
+            {waitlistState === 'error' && (
+              <div className="waitlist-error">Something went wrong. Try again.</div>
+            )}
+          </form>
+        )}
+
+        <div className="contest-fine-print">
+          Winner selected from verified business-email entries at launch.
+          No analysts were harmed in the making of this promotion.
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import * as htmlToImage from 'html-to-image';
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
@@ -146,7 +146,14 @@ function pickMeme() {
   return MEMES[Math.floor(Math.random() * MEMES.length)];
 }
 
-function getLinkedInCaption({ nickname, rank, evaluation, task }) {
+// Derive a consistent meme from a UUID without storing it in the DB
+function getMemeFromId(id) {
+  if (!id) return MEMES[0];
+  const hex = id.replace(/-/g, '')[0];
+  return MEMES[parseInt(hex, 16) % MEMES.length];
+}
+
+function getLinkedInCaption({ nickname, rank, evaluation, task, shareUrl }) {
   const score = evaluation.overall_score;
   const tone = score >= 90
     ? 'Somewhere, an MD replied "Looks good, send."'
@@ -162,7 +169,9 @@ function getLinkedInCaption({ nickname, rank, evaluation, task }) {
     `I played Mandate Mayhem as "${nickname}" and scored ${score}/100 (rank #${rank}).`,
     `Today's fire drill: ${taskSnippet}${taskSnippet.endsWith('.') ? '' : '...'}`,
     tone,
-    'Think you can beat it without sounding passive-aggressive?',
+    shareUrl
+      ? `Think you can beat it? See my result and try: ${shareUrl}`
+      : 'Think you can beat it without sounding passive-aggressive?',
   ].join('\n');
 }
 
@@ -200,6 +209,70 @@ function LoadingOverlay({ message }) {
           <span /><span /><span />
         </div>
         <p className="loading-msg">{message}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen: Shared Result (read-only view via ?result=UUID) ─────────────────
+function SharedResultScreen({ entry, rank, onStartOwn }) {
+  const meme = getMemeFromId(entry.id);
+  const totalIsUnknown = true; // we don't load full leaderboard for shared views
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
+  return (
+    <div className="screen screen--shared">
+      <img className="plomo-logo" src="/plomo.png" alt="Plomo logo" />
+      <div className="shared-eyebrow">MANDATE MAYHEM — RESULT</div>
+
+      <div className="share-card share-card--standalone">
+        <MemeBlock meme={meme} compact />
+        <div className="share-card-body">
+          <div className="sc-title">MANDATE MAYHEM</div>
+          <div className="sc-nickname">{entry.nickname}</div>
+          <div className="sc-score">
+            {entry.overall_score}<span className="sc-score-denom">/100</span>
+          </div>
+          <div className="sc-label">{entry.label}</div>
+          <div className="sc-roast">"{entry.one_line_roast}"</div>
+          <div className="sc-rank">Rank #{rank}</div>
+          <div className="sc-cta">Plomo helps you survive the whole deal.</div>
+        </div>
+      </div>
+
+      <div className="shared-task-block">
+        <div className="screen-label">THE TASK THEY SURVIVED</div>
+        <p className="shared-task-prompt">{entry.task_prompt}</p>
+        {entry.short_display_answer && (
+          <>
+            <div className="screen-label" style={{ marginTop: 12 }}>THEIR ANSWER</div>
+            <p className="shared-answer">"{entry.short_display_answer}"</p>
+          </>
+        )}
+      </div>
+
+      <div className="shared-cta-block">
+        <div className="shared-cta-headline">Think you can beat rank #{rank}?</div>
+        <button className="btn btn--primary btn--wide" onClick={onStartOwn}>
+          Start the test →
+        </button>
+        <a
+          className="btn btn--cta btn--wide"
+          href="https://plomo.ai/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Try Plomo — survive the whole deal
+        </a>
+        <button className="btn btn--ghost" onClick={handleCopyLink}>
+          {copied ? 'Link copied.' : 'Copy this result link'}
+        </button>
       </div>
     </div>
   );
@@ -297,7 +370,7 @@ function TaskScreen({ meme, task, answer, onChange, onSubmit, loading }) {
 // ─── Screen: Result ───────────────────────────────────────────────────────────
 function ResultScreen({
   nickname, task, evaluation,
-  leaderboard, rank, meme,
+  leaderboard, rank, meme, entryId,
   onPlayAgain, shareCardRef,
 }) {
   const currentRowRef = useRef(null);
@@ -344,16 +417,26 @@ function ResultScreen({
     }
   };
 
-  const [linkedInTooltip, setLinkedInTooltip] = useState('');
+  const [liStep, setLiStep] = useState('idle'); // idle | copied
+
+  const resultUrl = entryId
+    ? `${window.location.origin}${window.location.pathname}?result=${entryId}`
+    : null;
 
   const handleShareLinkedIn = () => {
-    const caption = getLinkedInCaption({ nickname, rank, evaluation, task });
-    navigator.clipboard.writeText(caption).catch(() => {});
-    const shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' +
-      encodeURIComponent('https://plomo.ai');
-    window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=600');
-    setLinkedInTooltip('Caption copied — paste it into the post box.');
-    setTimeout(() => setLinkedInTooltip(''), 5000);
+    if (liStep === 'idle') {
+      // Step 1: copy caption only
+      const caption = getLinkedInCaption({ nickname, rank, evaluation, task, shareUrl: resultUrl });
+      navigator.clipboard.writeText(caption).catch(() => {});
+      setLiStep('copied');
+    } else {
+      // Step 2: open LinkedIn
+      const liUrl = resultUrl
+        ? 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(resultUrl)
+        : 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://plomo.ai');
+      window.open(liUrl, '_blank', 'noopener,noreferrer,width=620,height=620');
+      setLiStep('idle');
+    }
   };
 
   useLayoutEffect(() => {
@@ -403,18 +486,7 @@ function ResultScreen({
         <div className="roast-line">"{evaluation.one_line_roast}"</div>
       </div>
 
-      <div className="result-section">
-        <div className="screen-label">AT A GLANCE</div>
-        <div className="metric-pills">
-          {quickMetrics.map(([label, score]) => (
-            <div key={label} className="metric-pill">
-              <span className="metric-pill-label">{label}</span>
-              <span className="metric-pill-score">{score}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
+      {/* ── Leaderboard ─────────────────────────────────────────── */}
       <div className="result-section">
         <div className="screen-label">LEADERBOARD</div>
         <p className="ranking-statement">{rankingLine}</p>
@@ -435,8 +507,8 @@ function ResultScreen({
               {leaderboard.map((entry, i) => (
                 <tr
                   key={entry.id}
-                  ref={i + 1 === rank ? currentRowRef : undefined}
-                  className={i + 1 === rank ? 'lb-row--current' : ''}
+                  ref={entry.id === entryId ? currentRowRef : undefined}
+                  className={entry.id === entryId ? 'lb-row--current' : ''}
                 >
                   <td className="lb-rank">{i + 1}</td>
                   <td className="lb-name">{entry.nickname}</td>
@@ -446,6 +518,19 @@ function ResultScreen({
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* ── At a Glance ──────────────────────────────────────────── */}
+      <div className="result-section">
+        <div className="screen-label">AT A GLANCE</div>
+        <div className="metric-pills">
+          {quickMetrics.map(([label, score]) => (
+            <div key={label} className="metric-pill">
+              <span className="metric-pill-label">{label}</span>
+              <span className="metric-pill-score">{score}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -511,21 +596,25 @@ function ResultScreen({
         </a>
       </div>
 
-      <div className="share-actions">
-        <button className="btn btn--primary" onClick={handleDownload}>
-          Download result
-        </button>
-        <div className="linkedin-btn-wrap">
-          <button className="btn btn--secondary" onClick={handleShareLinkedIn}>
-            Share on LinkedIn
+      <div className={`share-actions${liStep === 'copied' ? ' share-actions--li-open' : ''}`}>
+        {liStep !== 'copied' && (
+          <button className="btn btn--primary" onClick={handleDownload}>
+            Download result
           </button>
-          {linkedInTooltip && (
-            <div className="linkedin-tooltip">{linkedInTooltip}</div>
-          )}
+        )}
+        <div className="linkedin-btn-wrap">
+          <button
+            className={`btn btn--secondary${liStep === 'copied' ? ' btn--copied' : ''}`}
+            onClick={handleShareLinkedIn}
+          >
+            {liStep === 'copied' ? 'Copied — tap to open LinkedIn' : 'Share on LinkedIn'}
+          </button>
         </div>
-        <button className="btn btn--secondary" onClick={onPlayAgain}>
-          Try again
-        </button>
+        {liStep !== 'copied' && (
+          <button className="btn btn--secondary" onClick={onPlayAgain}>
+            Try again
+          </button>
+        )}
       </div>
     </div>
   );
@@ -542,10 +631,30 @@ export default function App() {
   const [evaluation, setEvaluation] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [rank, setRank] = useState(null);
+  const [entryId, setEntryId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
   const [error, setError] = useState('');
+
+  // Shared result state (when arriving via ?result=UUID)
+  const [sharedResult, setSharedResult] = useState(null);
+  const [sharedLoading, setSharedLoading] = useState(false);
+  const [sharedError, setSharedError] = useState('');
+
   const shareCardRef = useRef(null);
+
+  // On mount: check for ?result=UUID in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const resultId = params.get('result');
+    if (!resultId) return;
+    setSharedLoading(true);
+    fetch(`/api/result/${resultId}`)
+      .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+      .then(data => setSharedResult(data))
+      .catch(() => setSharedError('This result could not be found. It may have been removed.'))
+      .finally(() => setSharedLoading(false));
+  }, []);
 
   const handleStart = async (finalNickname) => {
     setNickname(finalNickname);
@@ -612,8 +721,9 @@ export default function App() {
         }),
       });
       if (!saveRes.ok) throw new Error('Save failed');
-      const { rank: userRank } = await saveRes.json();
+      const { rank: userRank, entry: savedEntry } = await saveRes.json();
       setRank(userRank);
+      setEntryId(savedEntry?.id ?? null);
 
       // 3. Fetch leaderboard
       const lbRes = await fetch('/api/leaderboard');
@@ -635,12 +745,52 @@ export default function App() {
     setTask(null);
     setAnswer('');
     setRank(null);
+    setEntryId(null);
     setLeaderboard([]);
     setError('');
     setNickname('');
     setGeneratedNickname(generateNickname());
+    setSharedResult(null);
+    setSharedError('');
+    // Clear ?result= from URL without reloading
+    window.history.replaceState({}, '', window.location.pathname);
     setScreen('landing');
   };
+
+  // Shared result view (arrived via ?result=UUID)
+  if (sharedLoading) {
+    return (
+      <div className="app">
+        <LoadingOverlay message="Loading result..." />
+      </div>
+    );
+  }
+
+  if (sharedResult) {
+    return (
+      <div className="app">
+        <SharedResultScreen
+          entry={sharedResult.entry}
+          rank={sharedResult.rank}
+          onStartOwn={handlePlayAgain}
+        />
+      </div>
+    );
+  }
+
+  if (sharedError) {
+    return (
+      <div className="app">
+        <div className="shared-not-found">
+          <div className="landing-title">MANDATE<br />MAYHEM</div>
+          <p>{sharedError}</p>
+          <button className="btn btn--primary" onClick={handlePlayAgain}>
+            Start your own run →
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -673,6 +823,7 @@ export default function App() {
           leaderboard={leaderboard}
           rank={rank}
           meme={meme}
+          entryId={entryId}
           onPlayAgain={handlePlayAgain}
           shareCardRef={shareCardRef}
         />

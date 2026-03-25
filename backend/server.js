@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
@@ -98,12 +99,13 @@ Character limit: 140 characters
 Their answer (${answer.length} chars):
 "${answer}"
 
-Evaluate this answer with a playful tone and a generous scoring baseline.
+Evaluate this answer with a playful tone. Scores must be precise and differentiated — do NOT round to nearest 5 or 10. Use the full 0–100 range actively.
+
 Reward:
 - clarity under pressure
 - practical diplomacy
 - clever/funny phrasing that still sounds plausibly workplace-safe
-Penalise only meaningful issues (broken constraints, incoherent wording, unrealistic tone). Do not harshly penalise minor awkward phrasing.
+Penalise meaningfully for: broken constraints, incoherent wording, passive-aggressive tone, missed task, wasted characters, or generic filler.
 
 Return ONLY valid JSON with no markdown, no code fences, no extra text:
 {
@@ -125,13 +127,22 @@ Tone examples for verdict:
 - "You kept it professional, which is impressive given the scene."
 - "This reads like someone who has seen version 19 and lived to tell it."
 
-Scoring calibration (important):
-- Default solid answer that follows constraints: 68-82
-- Funny + clear + constraint-adherent answer: 80-92
-- Excellent answer: 90-98
-- Below 50 only for clearly poor or constraint-breaking answers
-- If answer is funny AND competent, it should usually land above 75
-Be consistent.
+Scoring calibration — use the FULL range and be precise:
+- Masterclass answer (funny, clear, every constraint nailed, memorable phrasing): 91–99
+- Strong answer (clear, constrained, solid tone, minor room for improvement): 78–90
+- Competent but flat (follows constraints, gets the job done, no spark): 62–77
+- Partial misfire (one constraint broken, tone slightly off, or vague): 45–61
+- Clear failure (multiple constraints broken, incoherent, or misses the task entirely): 20–44
+- Unusable (offensive, nonsensical, or blank equivalent): 0–19
+
+Sub-score rules (each scored independently — they will differ from each other):
+- professionalism: Would an MD forward this without edits? Low if informal, hyperbolic, or clumsy.
+- diplomacy: Does it manage relationships without damage? Low if blaming, confrontational, or passive-aggressive.
+- clarity: Is the message instantly understood in one read? Low if ambiguous, over-compressed, or jargon-dense without payoff.
+- constraint_adherence: Did they follow all 3 constraints precisely? Deduct ~20 pts per broken constraint.
+- passive_aggression_control: Is it genuinely neutral, or is there a detectable edge? Low if sarcasm bleeds through.
+
+Do NOT cluster scores. A mediocre answer should score in the 50s, not the 70s. A great answer should score in the high 80s or 90s, not the mid-70s. Reward genuine quality and punish genuine failures.
 
 Return only the raw JSON object.`
       }]
@@ -205,6 +216,32 @@ app.get('/api/leaderboard', async (req, res) => {
   } catch (err) {
     console.error('leaderboard GET error:', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+// ─── Fetch Single Result (for shareable link) ────────────────────────────────
+app.get('/api/result/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await supabase
+      .from('leaderboard_entries')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return res.status(404).json({ error: 'Result not found' });
+
+    const { count, error: rankError } = await supabase
+      .from('leaderboard_entries')
+      .select('*', { count: 'exact', head: true })
+      .gt('overall_score', data.overall_score);
+
+    if (rankError) throw rankError;
+
+    res.json({ entry: data, rank: (count ?? 0) + 1 });
+  } catch (err) {
+    console.error('result GET error:', err);
+    res.status(500).json({ error: 'Failed to fetch result' });
   }
 });
 

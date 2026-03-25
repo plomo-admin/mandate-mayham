@@ -724,44 +724,90 @@ body {
 }
 
 .linkedin-btn-wrap {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
+  flex: 1;
+  min-width: 140px;
 }
 
-.linkedin-tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0a0a0a;
-  color: #fff;
-  font-size: 0.72rem;
-  white-space: nowrap;
-  padding: 5px 10px;
-  pointer-events: none;
-  animation: fadeInUp 0.15s ease;
+.linkedin-btn-wrap .btn {
+  width: 100%;
 }
 
-.linkedin-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #0a0a0a;
+.share-actions--li-open .linkedin-btn-wrap {
+  flex: 1 1 100%;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+.btn--copied {
+  border-color: #2a7a2a !important;
+  color: #2a7a2a !important;
 }
 
 .share-actions .btn {
   flex: 1;
   min-width: 140px;
+}
+
+/* ── Shared Result Screen ──────────────────────────────────────────────────── */
+.screen--shared {
+  gap: 24px;
+}
+
+.shared-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.share-card--standalone {
+  border: 2px solid #0a0a0a;
+}
+
+.shared-task-block {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shared-task-prompt {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #222;
+}
+
+.shared-answer {
+  font-size: 0.88rem;
+  color: #444;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.shared-cta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px solid #0a0a0a;
+  padding: 24px;
+  text-align: center;
+  align-items: center;
+}
+
+.shared-cta-headline {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.shared-not-found {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+  padding-top: 60px;
 }
 
 /* ── Error Banner ──────────────────────────────────────────────────────────── */

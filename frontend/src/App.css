@@ -45,7 +45,7 @@ body {
 .screen--landing {
   text-align: center;
   padding: 4px 0 40px;
-  gap: 12px;
+  gap: 6px;
 }
 
 .landing-title {
@@ -78,7 +78,7 @@ body {
   font-size: 1.1rem;
   font-weight: 700;
   color: #0a0a0a;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .landing-desc {

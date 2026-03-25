@@ -344,9 +344,16 @@ function ResultScreen({
     }
   };
 
-  const handleCopyCaption = () => {
+  const [linkedInTooltip, setLinkedInTooltip] = useState('');
+
+  const handleShareLinkedIn = () => {
     const caption = getLinkedInCaption({ nickname, rank, evaluation, task });
     navigator.clipboard.writeText(caption).catch(() => {});
+    const shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' +
+      encodeURIComponent('https://plomo.ai');
+    window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=600');
+    setLinkedInTooltip('Caption copied — paste it into the post box.');
+    setTimeout(() => setLinkedInTooltip(''), 5000);
   };
 
   useLayoutEffect(() => {
@@ -508,9 +515,14 @@ function ResultScreen({
         <button className="btn btn--primary" onClick={handleDownload}>
           Download result
         </button>
-        <button className="btn btn--secondary" onClick={handleCopyCaption}>
-          Copy LinkedIn caption
-        </button>
+        <div className="linkedin-btn-wrap">
+          <button className="btn btn--secondary" onClick={handleShareLinkedIn}>
+            Share on LinkedIn
+          </button>
+          {linkedInTooltip && (
+            <div className="linkedin-tooltip">{linkedInTooltip}</div>
+          )}
+        </div>
         <button className="btn btn--secondary" onClick={onPlayAgain}>
           Try again
         </button>

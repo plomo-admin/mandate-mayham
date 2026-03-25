@@ -723,6 +723,42 @@ body {
   gap: 10px;
 }
 
+.linkedin-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.linkedin-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  padding: 5px 10px;
+  pointer-events: none;
+  animation: fadeInUp 0.15s ease;
+}
+
+.linkedin-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #0a0a0a;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .share-actions .btn {
   flex: 1;
   min-width: 140px;

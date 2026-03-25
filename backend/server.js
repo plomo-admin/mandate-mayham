@@ -270,5 +270,11 @@ app.post('/api/waitlist', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Mandate Mayhem backend running on port ${PORT}`));
+// Export for Vercel serverless
+export default app;
+
+// Local dev only
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => console.log(`Mandate Mayhem backend running on port ${PORT}`));
+}
